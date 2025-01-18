@@ -31,6 +31,7 @@ app.get('/', (req, res) => {
 });
 app.get('/campgrounds', async (req, res) => {
     const campgrounds = await Campground.find({});
+    // pass campgrounds to the index.ejs file via res.render
     res.render('campgrounds/index', { campgrounds })
 });
 app.get('/campgrounds/new', (req, res) => {
