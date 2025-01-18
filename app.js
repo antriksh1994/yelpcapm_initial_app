@@ -35,10 +35,22 @@ app.use((req, res, next) => {
     console.log('==next==', req.method.toLocaleUpperCase(), req.path)
     next()
 })
+const verifyPassword = (req,res,next) => {
+    const {password} = req.query
+    console.log('==83==qury', password)
+    if (password === 'aa') {
+        next()
+    }
+    res.send('YOU NEED A PASSWORD')
+}
 
 app.get('/', (req, res) => {
     res.render('home')
 });
+// to protect any route we can add this 
+app.get('/secret', verifyPassword, (req,res) => {
+    res.send('MY SECRET IS')
+})
 app.get('/campgrounds', async (req, res) => {
     const campgrounds = await Campground.find({});
     // pass campgrounds to the index.ejs file via res.render
@@ -77,7 +89,6 @@ app.delete('/campgrounds/:id', async (req, res) => {
     await Campground.findByIdAndDelete(id);
     res.redirect('/campgrounds');
 })
-
 
 app.use((req,res) => {
     res.status(404).send('NOT FOUND!!')
