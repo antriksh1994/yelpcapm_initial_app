@@ -3,6 +3,9 @@ const path = require('path');
 const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 const Campground = require('./models/campground');
+const morgan = require('morgan')
+
+morgan('tiny')
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
     useNewUrlParser: true,
@@ -22,9 +25,11 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
 // to parse the req.body else it will be empty
+// this will run on every single request
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 
+app.use(morgan('tiny'))
 
 app.get('/', (req, res) => {
     res.render('home')
