@@ -21,7 +21,7 @@ const app = express();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
-
+// to parse the req.body else it will be empty
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 
@@ -46,6 +46,7 @@ app.post('/campgrounds', async (req, res) => {
 })
 
 app.get('/campgrounds/:id', async (req, res,) => {
+    console.log('==49==', req.params)
     const campground = await Campground.findById(req.params.id)
     res.render('campgrounds/show', { campground });
 });
