@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 const Campground = require('./models/campground');
 const morgan = require('morgan')
+const ejsMate = require('ejs-mate')
 
 morgan('tiny')
 
@@ -21,7 +22,7 @@ db.once("open", () => {
 
 const app = express();
 
-
+app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
 // to parse the req.body else it will be empty
