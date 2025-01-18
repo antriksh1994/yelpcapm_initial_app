@@ -30,6 +30,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 
 app.use(morgan('tiny'))
+// app.use(morgan('common'))
+app.use((req, res, next) => {
+    console.log('==next==', req.method.toLocaleUpperCase(), req.path)
+    next()
+})
 
 app.get('/', (req, res) => {
     res.render('home')
@@ -74,6 +79,9 @@ app.delete('/campgrounds/:id', async (req, res) => {
 })
 
 
+app.use((req,res) => {
+    res.send('NOT FOUND')
+})
 
 app.listen(3000, () => {
     console.log('Serving on port 3000')
