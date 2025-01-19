@@ -5,6 +5,7 @@ const methodOverride = require('method-override');
 const Campground = require('./models/campground');
 const morgan = require('morgan')
 const ejsMate = require('ejs-mate')
+const AppError = require('./AppErrors')
 
 morgan('tiny')
 
@@ -42,7 +43,9 @@ const verifyPassword = (req,res,next) => {
     if (password === 'aa') {
         next()
     }
-    res.send('YOU NEED A PASSWORD')
+    // res.send('YOU NEED A PASSWORD')
+    res.status(401)
+    throw new AppError('password required!', 401)
 }
 
 app.get('/', (req, res) => {
@@ -94,6 +97,18 @@ app.delete('/campgrounds/:id', async (req, res) => {
 app.use((req,res) => {
     res.status(404).send('NOT FOUND!!')
 })
+
+app.use((err, req, res, next) => {
+   console.log('***************************************');
+   console.log('******************ERROR****************');
+   console.log('***************************************');
+   console.log('err-', err)
+   next(err)
+   
+//    res.status(500).send('OHH WE GOT AN ERROR!!')
+   
+})
+
 
 app.listen(3000, () => {
     console.log('Serving on port 3000')
