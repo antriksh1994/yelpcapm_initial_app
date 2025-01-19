@@ -55,6 +55,9 @@ app.get('/', (req, res) => {
 app.get('/secret', verifyPassword, (req,res) => {
     res.send('MY SECRET IS')
 })
+app.get('/admin', (req, res) => {
+    throw new AppError('YOU ARE NOT ADMIN', 403)
+ })
 app.get('/campgrounds', async (req, res) => {
     const campgrounds = await Campground.find({});
     // pass campgrounds to the index.ejs file via res.render
