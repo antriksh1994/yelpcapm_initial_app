@@ -98,17 +98,18 @@ app.use((req,res) => {
     res.status(404).send('NOT FOUND!!')
 })
 
+// app.use((err, req, res, next) => {
+//    console.log('***************************************');
+//    console.log('******************ERROR****************');
+//    console.log('***************************************');
+//    console.log('err-', err)
+//    next(err)
+// //    res.status(500).send('OHH WE GOT AN ERROR!!')
+// })
 app.use((err, req, res, next) => {
-   console.log('***************************************');
-   console.log('******************ERROR****************');
-   console.log('***************************************');
-   console.log('err-', err)
-   next(err)
-   
-//    res.status(500).send('OHH WE GOT AN ERROR!!')
-   
-})
-
+    const {status = 500, message = "SOMETHING WENT WRONG" } = err
+    res.status(status).send(message)
+    })
 
 app.listen(3000, () => {
     console.log('Serving on port 3000')
