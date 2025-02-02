@@ -2,11 +2,21 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const methodOverride = require('method-override');
-const Campground = require('./models/campground');
 const morgan = require('morgan')
 const ejsMate = require('ejs-mate')
 const AppError = require('./AppErrors')
-
+const campgroundsRoutes = require('./routes/campgrounds-routes')
+const session = require('express-session')
+const sessionConfig = {
+    secret: 'thishouldbebettersecret!',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7
+    }
+}
 morgan('tiny')
 
 mongoose.connect('mongodb://localhost:27017/yelp-camp', {
@@ -30,7 +40,7 @@ app.set('views', path.join(__dirname, 'views'))
 // this will run on every single request
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
-
+app.use(session(sessionConfig))
 app.use(morgan('tiny'))
 // app.use(morgan('common'))
 app.use((req, res, next) => {
@@ -47,7 +57,7 @@ const verifyPassword = (req,res,next) => {
     res.status(401)
     throw new AppError('password required!', 401)
 }
-
+app.use('/campgrounds', campgroundsRoutes)
 app.get('/', (req, res) => {
     res.render('home')
 });
@@ -58,48 +68,6 @@ app.get('/secret', verifyPassword, (req,res) => {
 app.get('/admin', (req, res) => {
     throw new AppError('YOU ARE NOT ADMIN', 403)
  })
-app.get('/campgrounds', async (req, res) => {
-    const campgrounds = await Campground.find({});
-    // pass campgrounds to the index.ejs file via res.render
-    res.render('campgrounds/index', { campgrounds })
-});
-app.get('/campgrounds/new', (req, res) => {
-    res.render('campgrounds/new');
-})
-
-app.post('/campgrounds', async (req, res) => {
-    console.log('==41==req', req.body)
-    const campground = new Campground(req.body.campground);
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`)
-})
-
-app.get('/campgrounds/:id', async (req, res, next) => {
-    console.log('==49==', req.params)
-    const campground = await Campground.findById(req.params.id)
-    if (!campground) {
-        return next(new AppError('Product not found', 404))
-    }
-    res.render('campgrounds/show', { campground });
-});
-
-app.get('/campgrounds/:id/edit', async (req, res) => {
-    const {id} = req.params;
-    const campground = await Campground.findById(id)
-    res.render('campgrounds/edit', { campground });
-})
-
-app.put('/campgrounds/:id', async (req, res) => {
-    const { id } = req.params;
-    const campground = await Campground.findByIdAndUpdate(id, { ...req.body.campground });
-    res.redirect(`/campgrounds/${campground._id}`)
-});
-
-app.delete('/campgrounds/:id', async (req, res) => {
-    const { id } = req.params;
-    await Campground.findByIdAndDelete(id);
-    res.redirect('/campgrounds');
-})
 
 app.use((req,res) => {
     res.status(404).send('NOT FOUND!!')
